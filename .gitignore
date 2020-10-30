@@ -4,3 +4,7 @@
 # openFrameworks
 obj
 *.app
+*.xcconfig
+*.plist
+config.make
+*.xcodeproj
