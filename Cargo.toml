@@ -1,5 +1,5 @@
 [package]
-name = "sketches"
+name = "Sketches"
 version = "0.1.0"
 authors = ["Hideaki Tai <hideaki.tai@gmail.com>"]
 edition = "2018"
@@ -11,6 +11,5 @@ nannou = "0.15"
 
  [workspace]
 members = [
-    "empty",
-    "000_nannou_template"
+    "S000_nannou_template",
 ]
