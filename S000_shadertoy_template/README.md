@@ -1,7 +1,7 @@
 
 ## `coordinate.frag`
 
-![coordinate.frag](coordinate.gif)
+<img src="coordinate.gif" width="256">
 
 ## Reference
 
