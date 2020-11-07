@@ -11,5 +11,6 @@ nannou = "0.15"
 
  [workspace]
 members = [
-    "S000_nannou_template",
+    "S000_nannou_sketch_template",
+    "S000_nannou_shader_template",
 ]
