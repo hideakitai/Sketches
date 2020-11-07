@@ -280,3 +280,40 @@ fn captured_frame_path(app: &App, num_frame: u64) -> std::path::PathBuf {
         // The extension will be PNG. We also support tiff, bmp, gif, jpeg, webp and some others.
         .with_extension("png")
 }
+
+// impl draw::Draw {
+//     /// Render the **Draw**'s inner list of commands to the texture associated with the **Frame**.
+//     ///
+//     /// The **App** stores a unique render.
+//     pub fn to_frame(&self, app: &App, frame: &Frame) -> Result<(), draw::renderer::DrawError> {
+//         let window_id = frame.window_id();
+//         let window = app
+//             .window(window_id)
+//             .expect("no window to draw to for `Draw`'s window_id");
+
+//         // Retrieve a renderer for this window.
+//         let renderers = app.draw_state.renderers.borrow_mut();
+//         let renderer = RefMut::map(renderers, |renderers| {
+//             renderers.entry(window_id).or_insert_with(|| {
+//                 let device = window.swap_chain_device();
+//                 let frame_dims: [u32; 2] = window.tracked_state.physical_size.into();
+//                 let scale_factor = window.tracked_state.scale_factor as f32;
+//                 let msaa_samples = window.msaa_samples();
+//                 let target_format = crate::frame::Frame::TEXTURE_FORMAT;
+//                 let renderer = draw::RendererBuilder::new().build(
+//                     device,
+//                     frame_dims,
+//                     scale_factor,
+//                     msaa_samples,
+//                     target_format,
+//                 );
+//                 RefCell::new(renderer)
+//             })
+//         });
+
+//         let scale_factor = window.tracked_state.scale_factor as _;
+//         let mut renderer = renderer.borrow_mut();
+//         renderer.render_to_frame(window.swap_chain_device(), self, scale_factor, frame);
+//         Ok(())
+//     }
+// }
