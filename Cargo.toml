@@ -13,4 +13,5 @@ nannou = "0.15"
 members = [
     "s000_nannou_sketch_template",
     "s000_nannou_shader_template",
+    "s020_wgpu_shadow_example",
 ]
