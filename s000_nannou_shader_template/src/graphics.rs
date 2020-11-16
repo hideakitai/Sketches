@@ -78,9 +78,19 @@ pub fn create_uniforms([w, h]: [u32; 2], view: Matrix4<f32>) -> Uniforms {
     }
 }
 
-pub fn create_bind_group_layout(device: &wgpu::Device) -> wgpu::BindGroupLayout {
+pub fn create_bind_group_layout(
+    device: &wgpu::Device,
+    texture_component_type: wgpu::TextureComponentType,
+) -> wgpu::BindGroupLayout {
     wgpu::BindGroupLayoutBuilder::new()
         .uniform_buffer(wgpu::ShaderStage::VERTEX, false)
+        .sampled_texture(
+            wgpu::ShaderStage::FRAGMENT,
+            false,
+            wgpu::TextureViewDimension::D2,
+            texture_component_type,
+        )
+        .sampler(wgpu::ShaderStage::FRAGMENT)
         .build(device)
 }
 

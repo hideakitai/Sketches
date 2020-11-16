@@ -25,7 +25,7 @@ fn model(app: &App) -> Model {
     // build window
     let w_id = app
         .new_window()
-        .size(1280, 720)
+        .size(1024, 1024)
         .title("nannou")
         .key_pressed(key_pressed)
         .view(view)

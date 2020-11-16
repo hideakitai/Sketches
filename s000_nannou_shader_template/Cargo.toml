@@ -1,5 +1,5 @@
 [package]
-name = "S000_nannou_shader_template"
+name = "s000_nannou_shader_template"
 version = "0.1.0"
 authors = ["Hideaki Tai <hideaki.tai@gmail.com>"]
 edition = "2018"
