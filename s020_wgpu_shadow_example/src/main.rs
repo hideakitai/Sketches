@@ -24,6 +24,30 @@ struct Vertex {
     _normal: [i8; 4],
 }
 
+impl Vertex {
+    fn desc<'a>() -> wgpu::VertexBufferDescriptor<'a> {
+        let vertex_size = mem::size_of::<Vertex>();
+        let vb_desc = wgpu::VertexBufferDescriptor {
+            stride: vertex_size as wgpu::BufferAddress,
+            step_mode: wgpu::InputStepMode::Vertex,
+            // attributes: &wgpu::vertex_attr_array![0 => Char4, 1 => Char4],
+            attributes: &[
+                wgpu::VertexAttributeDescriptor {
+                    offset: 0,
+                    shader_location: 0,
+                    format: wgpu::VertexFormat::Char4,
+                },
+                wgpu::VertexAttributeDescriptor {
+                    offset: std::mem::size_of::<[i8; 4]>() as wgpu::BufferAddress,
+                    shader_location: 1,
+                    format: wgpu::VertexFormat::Char4,
+                },
+            ],
+        };
+        vb_desc
+    }
+}
+
 struct CubeDesc {
     offset: cgmath::Vector3<f32>,
     angle: f32,
@@ -328,7 +352,10 @@ fn create_entity_uniform_buffer(
     (entity_uniform_buf, entity_uniform_size)
 }
 
-fn create_shadow(device: &wgpu::Device) -> (wgpu::Texture, wgpu::TextureView, wgpu::Sampler) {
+fn create_shadow(
+    device: &wgpu::Device,
+    sc_desc: &wgpu::SwapChainDescriptor,
+) -> (wgpu::Texture, wgpu::TextureView, wgpu::Sampler) {
     // create shadow
     let shadow_sampler = device.create_sampler(&wgpu::SamplerDescriptor {
         label: Some("shadow"),
@@ -369,8 +396,7 @@ fn create_shadow(device: &wgpu::Device) -> (wgpu::Texture, wgpu::TextureView, wg
     //     .collect::<Vec<_>>();
 
     let shadow_texture = wgpu::TextureBuilder::new()
-        .size([Model::SHADOW_SIZE.width, Model::SHADOW_SIZE.height])
-        .depth(3)
+        .extent(Model::SHADOW_SIZE)
         .mip_level_count(1)
         .sample_count(1)
         .dimension(wgpu::TextureDimension::D2)
@@ -387,6 +413,16 @@ fn create_shadow(device: &wgpu::Device) -> (wgpu::Texture, wgpu::TextureView, wg
 fn create_lights(shadow_texture: &wgpu::Texture) -> Vec<Light> {
     let mut shadow_target_views = (0..2)
         .map(|i| {
+            // Some(shadow_texture.create_view(&wgpu::TextureViewDescriptor {
+            //     label: Some("shadow"),
+            //     format: None,
+            //     dimension: Some(wgpu::TextureViewDimension::D2),
+            //     aspect: wgpu::TextureAspect::All,
+            //     base_mip_level: 0,
+            //     level_count: None,
+            //     base_array_layer: i as u32,
+            //     array_layer_count: NonZeroU32::new(1),
+            // }))
             Some(
                 shadow_texture
                     .view()
@@ -570,7 +606,7 @@ fn create_shadow_pipeline(
         depth_stencil_state: Some(wgpu::DepthStencilStateDescriptor {
             format: Model::SHADOW_FORMAT,
             depth_write_enabled: true,
-            depth_compare: wgpu::CompareFunction::LessEqual,
+            depth_compare: wgpu::CompareFunction::Less,
             stencil: wgpu::StencilStateDescriptor::default(),
         }),
         vertex_state: wgpu::VertexStateDescriptor {
@@ -759,8 +795,11 @@ fn create_forward_depth(
     //     label: None,
     // });
     let depth_texture = wgpu::TextureBuilder::new()
-        .size([sc_desc.width, sc_desc.height])
-        .depth(1)
+        .extent(wgpu::Extent3d {
+            width: sc_desc.width,
+            height: sc_desc.height,
+            depth: 1,
+        })
         .mip_level_count(1)
         .sample_count(1)
         .dimension(wgpu::TextureDimension::D2)
@@ -782,8 +821,9 @@ fn model(app: &App) -> Model {
     // build window
     let window_id = app
         .new_window()
-        .size(512, 512)
+        .size(800, 600)
         .title("nannou")
+        .resized(resized)
         .key_pressed(key_pressed)
         .raw_view(raw_view)
         .build()
@@ -793,15 +833,7 @@ fn model(app: &App) -> Model {
     let window = app.window(window_id).unwrap(); // window reference
     let device = window.swap_chain_device(); // reference of gpu device
     let sc_desc = window.swap_chain_descriptor();
-
-    // TODO:
-    let vertex_size = mem::size_of::<Vertex>();
-    let vertex_attr = wgpu::vertex_attr_array![0 => Char4, 1 => Char4];
-    let vb_desc = wgpu::VertexBufferDescriptor {
-        stride: vertex_size as wgpu::BufferAddress,
-        step_mode: wgpu::InputStepMode::Vertex,
-        attributes: &vertex_attr,
-    };
+    let vb_desc = Vertex::desc();
 
     // entities
     let cube_descs = create_cube_descs();
@@ -815,7 +847,7 @@ fn model(app: &App) -> Model {
     // in the shadow render pass, shadows are baked into this texture.
     // in the forward render pass, these texture and sampler are binded as uniforms in bind group
     // so automatically shared with forward render pass after shadow render pass finished
-    let (shadow_texture, shadow_view, shadow_sampler) = create_shadow(&device);
+    let (shadow_texture, shadow_view, shadow_sampler) = create_shadow(&device, &sc_desc);
     let (shadow_uniform_buf, shadow_uniform_size) = create_shadow_uniform_buffer(&device);
     let (shadow_bind_group_layout, shadow_bind_group) =
         create_shadow_bind_group(&device, &shadow_uniform_buf, shadow_uniform_size);
@@ -890,6 +922,52 @@ fn update(_app: &App, model: &mut Model, _update: Update) {
 }
 
 fn event(_app: &App, _model: &mut Model, _event: Event) {}
+
+fn resized(app: &App, model: &mut Model, _: Vector2) {
+    let window = app.window(model.window_id).unwrap();
+    let sc_desc = window.swap_chain_descriptor();
+    let device = window.swap_chain_device();
+    let queue = window.swap_chain_queue();
+
+    // update view-projection matrix
+    let mx_total = Model::generate_matrix(sc_desc.width as f32 / sc_desc.height as f32);
+    let mx_ref: &[f32; 16] = mx_total.as_ref();
+    queue.write_buffer(
+        &model.forward_pass.uniform_buf,
+        0,
+        bytemuck::cast_slice(mx_ref),
+    );
+
+    // let depth_texture = device.create_texture(&wgpu::TextureDescriptor {
+    //     size: wgpu::Extent3d {
+    //         width: sc_desc.width,
+    //         height: sc_desc.height,
+    //         depth: 1,
+    //     },
+    //     mip_level_count: 1,
+    //     sample_count: 1,
+    //     dimension: wgpu::TextureDimension::D2,
+    //     format: Model::DEPTH_FORMAT,
+    //     usage: wgpu::TextureUsage::OUTPUT_ATTACHMENT,
+    //     label: None,
+    // });
+    // model.forward_depth = depth_texture.create_view(&wgpu::TextureViewDescriptor::default());
+    let depth_texture = wgpu::TextureBuilder::new()
+        .extent(wgpu::Extent3d {
+            width: sc_desc.width,
+            height: sc_desc.height,
+            depth: 1,
+        })
+        .mip_level_count(1)
+        .sample_count(1)
+        .dimension(wgpu::TextureDimension::D2)
+        .format(Model::DEPTH_FORMAT)
+        .usage(wgpu::TextureUsage::OUTPUT_ATTACHMENT)
+        // .label(None)
+        .build(&device);
+
+    model.forward_depth = depth_texture.view().build();
+}
 
 fn key_pressed(app: &App, model: &mut Model, key: Key) {
     if let Key::Space = key {
