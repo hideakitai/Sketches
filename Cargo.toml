@@ -8,10 +8,16 @@ edition = "2018"
 
 [dependencies]
 nannou = "0.15"
+image = "0.23"
+anyhow = "1.0"
 
- [workspace]
+[workspace]
 members = [
-    "s000_nannou_sketch_template",
-    "s000_nannou_shader_template",
-    "s020_wgpu_shadow_example",
+  "s000_nannou_sketch_template",
+  "s000_nannou_shader_template",
+  "s020_wgpu_shadow_example",
+  "s021_wgpu_cube_example",
+  "s022_wgpu_texture_camera",
+  "s023_wgpu_instancing",
+  "s024_wgpu_depth_buffer",
 ]
