@@ -20,4 +20,5 @@ members = [
   "s022_wgpu_texture_camera",
   "s023_wgpu_instancing",
   "s024_wgpu_depth_buffer",
+  "s025_wgpu_obj_loader",
 ]
