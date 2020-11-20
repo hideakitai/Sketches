@@ -21,4 +21,5 @@ members = [
   "s023_wgpu_instancing",
   "s024_wgpu_depth_buffer",
   "s025_wgpu_obj_loader",
+  "s026_wgpu_lights_phong",
 ]
