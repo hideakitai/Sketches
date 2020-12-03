@@ -1,0 +1,25 @@
+[package]
+name = "s031_wgpu_offline_rendering"
+version = "0.1.0"
+authors = ["Hideaki Tai <hideaki.tai@gmail.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+# nannou = "0.15"
+nannou = { git = "https://github.com/kazimuth/nannou.git", branch = "wgpu-0.6-3"}
+bytemuck = { version = "1.4", features = ["derive"] }
+image = "0.23"
+anyhow = "1.0"
+tobj = "2.0"
+rayon = "1.5"
+futures = "0.3"
+lazy_static = "1.4"
+
+[build-dependencies]
+anyhow = "1.0"
+fs_extra = "1.2"
+glob = "0.3"
+rayon = "1.5"
+shaderc = "0.6"

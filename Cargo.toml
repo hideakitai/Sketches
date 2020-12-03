@@ -23,4 +23,10 @@ members = [
   "s025_wgpu_obj_loader",
   "s026_wgpu_lights_phong",
   "s027_wgpu_lights_phong_view_space",
+  "s028_wgpu_normal_map",
+  "s029_wgpu_better_camera",
+  "s030_wgpu_threading_rayon",
+  "s031_wgpu_offline_rendering",
+  "s032_wgpu_offline_rendering_gif",
+  "s033_wgpu_compute_tangents",
 ]
