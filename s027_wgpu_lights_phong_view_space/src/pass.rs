@@ -35,7 +35,7 @@ impl PassMain {
     ) -> Self {
         let instances = Self::create_instances(device);
 
-        let dir = std::path::Path::new(env!("OUT_DIR")).join("assets");
+        let dir = std::path::Path::new("..").join("assets").join("learn_wgpu");
         let obj_model = Geom::load(&device, &queue, dir.join("cube.obj")).unwrap();
 
         let camera = Camera::new(

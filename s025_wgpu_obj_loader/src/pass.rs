@@ -46,7 +46,7 @@ impl Pass {
         // let diffuse_bind_group =
         //     create_diffuse_bind_group(device, &texture_bind_group_layout, &diffuse_texture);
 
-        let res_dir = std::path::Path::new(env!("OUT_DIR")).join("assets");
+        let res_dir = std::path::Path::new("..").join("assets").join("learn_wgpu");
         let obj_model = geom::Geom::load(
             &device,
             &queue,

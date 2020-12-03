@@ -164,7 +164,7 @@ pub fn create_objects(device: &wgpu::Device) -> (wgpu::Buffer, wgpu::Buffer, usi
 }
 
 pub fn create_texture(device: &wgpu::Device, queue: &wgpu::Queue) -> Texture {
-    let diffuse_bytes = include_bytes!("../assets/happy-tree.png");
+    let diffuse_bytes = include_bytes!("../../assets/learn_wgpu/happy-tree.png");
     Texture::from_bytes(&device, &queue, diffuse_bytes, "happy-tree.png").unwrap()
 }
 
