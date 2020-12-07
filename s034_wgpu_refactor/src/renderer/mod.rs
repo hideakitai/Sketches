@@ -5,7 +5,7 @@ use nannou::prelude::*;
 
 pub mod binding;
 pub mod camera;
-// pub mod draw;
+pub mod draw;
 pub mod geom;
 pub mod instance;
 pub mod light;
