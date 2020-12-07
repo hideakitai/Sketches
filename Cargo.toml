@@ -29,4 +29,5 @@ members = [
   "s031_wgpu_offline_rendering",
   "s032_wgpu_offline_rendering_gif",
   "s033_wgpu_compute_tangents",
+  "s034_wgpu_refactor",
 ]
